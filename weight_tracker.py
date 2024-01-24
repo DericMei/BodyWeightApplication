@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 # Function to connect to the database
-@st.cache(hash_funcs={sqlite3.Connection: id})
+@st.cache_data(hash_funcs={sqlite3.Connection: id})
 def get_connection():
     return sqlite3.connect('my_weight_tracker.db')
 
@@ -17,39 +17,62 @@ def get_last_recorded_weight(conn):
     return result[0] if result else None
 
 # Function to insert or update weight data
-def upsert_weight_data(conn, date, weight):
+def fill_missing_dates(conn, new_date, new_weight):
     cur = conn.cursor()
-    # Check if entry for today already exists
-    cur.execute("SELECT weight FROM weight_records WHERE date = ?", (date,))
-    if cur.fetchone():
-        # Update the record if entry for today exists
-        cur.execute("UPDATE weight_records SET weight = ? WHERE date = ?", (weight, date))
+    # Get the last entry from the database
+    cur.execute("SELECT date, weight FROM weight_records ORDER BY date DESC LIMIT 1")
+    last_entry = cur.fetchone()
+    
+    if last_entry:
+        last_entry_date = datetime.strptime(last_entry[0], '%Y-%m-%d').date()
+        last_weight = last_entry[1]
     else:
-        # Insert a new record if no entry for today
-        cur.execute("INSERT INTO weight_records (date, weight) VALUES (?, ?)", (date, weight))
+        last_entry_date = new_date - timedelta(days=1)
+        last_weight = new_weight
+    
+    # Calculate the difference in days between the last entry and the new date
+    delta = (new_date - last_entry_date).days
+    
+    # If there are missing dates, fill them with the last recorded weight
+    for i in range(1, delta):
+        missing_date = last_entry_date + timedelta(days=i)
+        cur.execute("INSERT INTO weight_records (date, weight) VALUES (?, ?)", 
+                    (missing_date.strftime('%Y-%m-%d'), last_weight))
+    
+    # Update the weight for the new date
+    cur.execute("INSERT OR REPLACE INTO weight_records (date, weight) VALUES (?, ?)", 
+                (new_date.strftime('%Y-%m-%d'), new_weight))
+    
     conn.commit()
+    
+    # Return the number of days filled to inform the user
+    return max(0, delta - 1)
+
 
 # Streamlit interface for weight entry
 def main():
     conn = get_connection()
-    st.title('Daily Weight Tracker')
+    st.title('Eric Mei BodyWeight Magic Tool!')
 
     # Input for today's weight
     today = datetime.now().date()
     last_weight = get_last_recorded_weight(conn)
-    
     st.subheader(f"Record Weight for Today: {today}")
-    input_weight = st.number_input('Enter your weight (kg):', value=last_weight)
+    input_weight = st.number_input('Enter your weight (kg):', min_value=70.0, max_value=95.0, value=last_weight, step=0.1)
 
     # Button to record the weight
     if st.button('Record Weight'):
-        upsert_weight_data(conn, today, input_weight)
+        # Fill missing dates with the last recorded weight and update today's weight
+        days_filled = fill_missing_dates(conn, today, input_weight)
+        
+        if days_filled:
+            st.info(f"Weight data for {days_filled} day(s) filled automatically with the last recorded weight.")
         st.success('Weight recorded successfully!')
     
     # Display the existing records
-    st.subheader('Weight Records')
-    df = pd.read_sql_query("SELECT * FROM weight_records", conn)
-    st.write(df)
+    st.subheader('Weight Records for Last 7 Days')
+    df = pd.read_sql_query("SELECT * FROM weight_records Order BY date DESC LIMIT 7", conn)
+    st.write(df.style.hide_index())
 
 if __name__ == "__main__":
     main()
