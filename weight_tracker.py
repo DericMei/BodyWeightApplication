@@ -4,9 +4,19 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 # Function to connect to the database
-@st.cache_data
+class DBConnection:
+    def __init__(self, db_file):
+        self.conn = sqlite3.connect(db_file, check_same_thread=False)
+
+    def __enter__(self):
+        return self.conn
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.conn.close()
+
+@st.cache_resource
 def get_connection():
-    return sqlite3.connect('my_weight_tracker.db', check_same_thread=False)
+    return DBConnection('my_weight_tracker.db')
 
 # Function to get the last recored weight
 def get_last_recorded_weight(conn):
