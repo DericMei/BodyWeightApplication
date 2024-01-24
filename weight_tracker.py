@@ -61,29 +61,29 @@ def fill_missing_dates(conn, new_date, new_weight):
 
 # Streamlit interface for weight entry
 def main():
-    conn = get_connection()
-    st.title('Eric Mei BodyWeight Magic Tool!')
+    with get_connection() as conn:
+        st.title('Eric Mei BodyWeight Magic Tool!')
 
-    # Input for today's weight
-    today = datetime.now().date()
-    last_weight = get_last_recorded_weight(conn)
-    st.subheader(f"Record Weight for Today: {today}")
-    input_weight = st.number_input('Enter your weight (kg):', min_value=70.0, max_value=95.0, value=last_weight, step=0.1)
+        # Input for today's weight
+        today = datetime.now().date()
+        last_weight = get_last_recorded_weight(conn)
+        st.subheader(f"Record Weight for Today: {today}")
+        input_weight = st.number_input('Enter your weight (kg):', min_value=70.0, max_value=95.0, value=last_weight, step=0.1)
 
-    # Button to record the weight
-    if st.button('Record Weight'):
-        # Fill missing dates with the last recorded weight and update today's weight
-        days_filled = fill_missing_dates(conn, today, input_weight)
+        # Button to record the weight
+        if st.button('Record Weight'):
+            # Fill missing dates with the last recorded weight and update today's weight
+            days_filled = fill_missing_dates(conn, today, input_weight)
+            
+            if days_filled:
+                st.info(f"Weight data for {days_filled} day(s) filled automatically with the last recorded weight.")
+            st.success('Weight recorded successfully!')
         
-        if days_filled:
-            st.info(f"Weight data for {days_filled} day(s) filled automatically with the last recorded weight.")
-        st.success('Weight recorded successfully!')
-    
-    # Display the existing records
-    st.subheader('Weight Records for Last 7 Days')
-    df = pd.read_sql_query("SELECT * FROM weight_records Order BY date DESC LIMIT 7", conn)
-    styled_df = df.style.hide_index()
-    st.write(styled_df)
+        # Display the existing records
+        st.subheader('Weight Records for Last 7 Days')
+        df = pd.read_sql_query("SELECT * FROM weight_records Order BY date DESC LIMIT 7", conn)
+        styled_df = df.style.hide_index()
+        st.write(styled_df)
 
 if __name__ == "__main__":
     main()
