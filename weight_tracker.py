@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 # Function to connect to the database
-@st.cache_data(hash_funcs={sqlite3.Connection: id})
+@st.cache(hash_funcs={sqlite3.Connection: id})
 def get_connection():
     return sqlite3.connect('my_weight_tracker.db')
 
