@@ -1,22 +1,82 @@
-import streamlit as st
-import sqlite3
-from datetime import datetime, timedelta
+# Import necessary libraries
+import dash
+from dash import html, dcc, Input, Output
+import plotly.express as px
 import pandas as pd
+import psycopg2
+import os
+import datetime
 
-# Function to connect to the database
-class DBConnection:
-    def __init__(self, db_file):
-        self.conn = sqlite3.connect(db_file, check_same_thread=False)
+# Connect to database
+def connect_to_db():
+    database_url = os.environ['postgres://ldxyurgvquzdsi:5464073634d12d89c3d98d4d47f8e0de542d17867b3d2aa2157668a59d50e80c@ec2-52-54-200-216.compute-1.amazonaws.com:5432/d77ae5bt6775c2']
+    conn = psycopg2.connect(database_url, sslmode='require')
+    return conn
 
-    def __enter__(self):
-        return self.conn
+# Initialize Dash app
+app = dash.Dash(__name__)
+server = app.server  # Expose the server variable for Heroku
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.conn.close()
+# Define Dash app layout
+app.layout = html.Div([
+    html.H1("Eric Mei BodyWeight Magic Tool!"),
 
-@st.cache_resource
-def get_connection():
-    return DBConnection('my_weight_tracker.db')
+    dcc.DatePickerSingle(
+        id='date-picker',
+        date=datetime.now().date(),
+        display_format='YYYY-MM-DD'
+    ),
+    
+    dcc.Input(
+        id='weight-input',
+        type='number',
+        min=70, max=95, step=0.1
+    ),
+    
+    html.Button('Record Weight', id='record-button'),
+    
+    html.Div(id='output-container'),
+    
+    dcc.Graph(id='weight-graph')
+])
+
+# Callbacks to handle user interaction
+@app.callback(
+    Output('output-container', 'children'),
+    Output('weight-graph', 'figure'),
+    Input('record-button', 'n_clicks'),
+    [Input('date-picker', 'date'), Input('weight-input', 'value')]
+)
+def record_weight(n_clicks, date, weight):
+    if n_clicks is not None and date is not None and weight is not None:
+        # Logic to handle weight recording and database interaction
+
+        # Generate a plotly figure based on the updated data
+        fig = px.line(...)  # Replace with your Plotly graph generation logic
+
+        return f'Weight recorded for {date}: {weight} kg', fig
+    
+    return '', px.line()  # Empty plot as a placeholder
+
+# Run the app
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####################
+
 
 # Function to get the last recored weight
 def get_last_recorded_weight(conn):
