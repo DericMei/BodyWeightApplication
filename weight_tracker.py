@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 # Function to connect to the database
-@st.cache(hash_funcs={sqlite3.Connection: id})
+@st.experimental_memo
 def get_connection():
-    return sqlite3.connect('my_weight_tracker.db')
+    return sqlite3.connect('my_weight_tracker.db', check_same_thread=False)
 
 # Function to get the last recored weight
 def get_last_recorded_weight(conn):
@@ -72,7 +72,8 @@ def main():
     # Display the existing records
     st.subheader('Weight Records for Last 7 Days')
     df = pd.read_sql_query("SELECT * FROM weight_records Order BY date DESC LIMIT 7", conn)
-    st.write(df.style.hide_index())
+    styled_df = df.style.hide_index()
+    st.write(styled_df)
 
 if __name__ == "__main__":
     main()
