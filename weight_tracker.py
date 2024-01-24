@@ -9,7 +9,7 @@ import datetime
 
 # Connect to database
 def connect_to_db():
-    database_url = os.environ['postgres://ldxyurgvquzdsi:5464073634d12d89c3d98d4d47f8e0de542d17867b3d2aa2157668a59d50e80c@ec2-52-54-200-216.compute-1.amazonaws.com:5432/d77ae5bt6775c2']
+    database_url = os.environ['']
     conn = psycopg2.connect(database_url, sslmode='require')
     return conn
 
