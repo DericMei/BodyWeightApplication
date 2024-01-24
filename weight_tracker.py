@@ -82,8 +82,8 @@ def main():
         # Display the existing records
         st.subheader('Weight Records for Last 7 Days')
         df = pd.read_sql_query("SELECT * FROM weight_records Order BY date DESC LIMIT 7", conn)
-        styled_df = df.style.hide_index()
-        st.write(styled_df)
+        df.reset_index(drop=True, inplace=True)
+        st.dataframe(df)
 
 if __name__ == "__main__":
     main()
