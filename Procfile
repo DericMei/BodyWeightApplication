@@ -1,0 +1,1 @@
+web: gunicorn weight_tracker:server

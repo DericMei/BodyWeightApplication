@@ -7,7 +7,7 @@ import psycopg2
 import os
 from datetime import datetime
 from datetime import timedelta
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import dash_bootstrap_components as dbc
 
@@ -31,6 +31,9 @@ app.layout = dbc.Container([
     interval=1*1000,  # in milliseconds
     n_intervals=0,
     max_intervals=1),
+
+    # Spacer
+    html.Div(style={'height': '10px'}),
 
     # Title of the application
     dbc.Card(dbc.CardHeader(html.H1(html.Strong("Eric Mei BodyWeight Magic!"), className='text-center'))),
@@ -57,18 +60,18 @@ app.layout = dbc.Container([
                         dbc.Col([
                             dbc.Card([
                                 dbc.CardBody([
-                                    html.H5(id='week-status', className='text-center'),
-                                    html.H5(id='current-week', className='text-center'),
-                                    html.H5(id='past-week', className='text-center')
+                                    html.H5(id='week-status', className='text-left'),
+                                    html.H5(id='past-week', className='text-left'),
+                                    html.H5(id='current-week', className='text-left')
                                 ])
                             ])
                         ], width=6),
                         dbc.Col([
                             dbc.Card([
                                 dbc.CardBody([
-                                    html.H5('weight-diff-status', className='text-center'),
-                                    html.H5('convert-calories', className='text-center'),
-                                    html.H5('advice', className='text-center')
+                                    html.H5(id='weight-diff', className='text-left'),
+                                    html.H5(id='calorie-status', className='text-left'),
+                                    html.H5(id='advice', className='text-left')
                                 ])
                             ])
                         ], width=6),
@@ -139,10 +142,10 @@ app.layout = dbc.Container([
                                 className='btn-primary btn-lg',
                                 style={'width': '100%'}
                             ),
-                        width=4, className='text-center'),
+                        width=3, className='text-center'),
                         dbc.Col(
                             html.Div(id='weight-record-status'),
-                        width=4, className='text-left')
+                        width=5, className='text-left')
                     ], className='align-items-center')
                 ])
             ]),
@@ -156,17 +159,17 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader(html.H4("Daily Weight for Past Week"), className='text-center'),
+                dbc.CardHeader(html.H4("Daily Weight Last Week"), className='text-center'),
                 dbc.CardBody([
-                    dcc.Graph(id='daily-weight-week', style={'padding': '0px', 'margin': '0px'})
+                    dcc.Graph(id='daily-weight-last-week', style={'padding': '0px', 'margin': '0px'})
                 ],style={'padding': '0px'})
             ]), 
         width=4),
         dbc.Col(
             dbc.Card([
-                dbc.CardHeader(html.H4("Daily Weight for Past 6 Weeks"), className='text-center'),
+                dbc.CardHeader(html.H4("Daily Weight Current Week"), className='text-center'),
                 dbc.CardBody([
-                    dcc.Graph(id='daily-weight-6weeks', style={'padding': '0px', 'margin': '0px'})
+                    dcc.Graph(id='daily-weight-current-week', style={'padding': '0px', 'margin': '0px'})
                 ],style={'padding': '0px'} )
             ]), width=4),
         dbc.Col(
@@ -274,39 +277,47 @@ def record_weight(n_clicks, weight):
         # Logic to handle weight recording and database interaction
         try:
             # Connect to the database
-            conn = engine.connect()
-            
-            # Check for the last recorded weight
-            last_record_query = "SELECT date, weight FROM weight_records ORDER BY date DESC LIMIT 1"
-            last_record = pd.read_sql(last_record_query, conn)
-            
-            # If there's no last record, we'll just insert today's weight
-            if last_record.empty:
-                conn.execute("INSERT INTO weights (date, weight) VALUES (%s, %s)", 
-                             (datetime.now().date().strftime('%Y-%m-%d'), weight))
-                conn.close()
-                return f'Recorded new weight for today: {weight} kg'
-            
-            # Calculate the average value for missing days
-            last_date = last_record['date'].iloc[0]
-            days_missing = (datetime.now().date() - last_date).days
-            if days_missing > 1:
-                for single_date in (last_date + timedelta(days=n) for n in range(1, days_missing)):
-                    average_weight = (last_record['weight'].iloc[0] + weight) / 2
-                    conn.execute("INSERT INTO weights (date, weight) VALUES (%s, %s)", 
-                                 (single_date, average_weight))
-            
-            # Finally, insert today's weight
-            conn.execute("INSERT INTO weights (date, weight) VALUES (%s, %s)", 
-                         (datetime.now().date(), weight))
-            conn.close()
-            return f'Weight recorded for {datetime.now().date()}: {weight} kg'
-        
+            with engine.connect() as conn:
+                # Check for the last recorded weight
+                last_record_query = text("SELECT date, weight FROM weight_records ORDER BY date DESC LIMIT 1")
+                result = conn.execute(last_record_query)
+                last_record = result.fetchone()
+                last_date, last_weight = last_record
+                days_missing = (datetime.now().date() - last_date).days
+                today_date_str = datetime.now().date().strftime('%Y-%m-%d')
+
+                check_query = text("SELECT weight FROM weight_records WHERE date = :today_date")
+                result = conn.execute(check_query, {'today_date': today_date_str})
+                today_record = result.fetchone()
+
+                if days_missing > 1:
+                    for n in range(1, days_missing):
+                        single_date_str = (last_date + timedelta(days=n)).strftime('%Y-%m-%d')
+                        average_weight = (last_weight + weight) / 2
+                        avg_instert_query = text("INSERT INTO weight_records (date, weight) VALUES (:date, :weight)")
+                        conn.execute(avg_instert_query, {'date': single_date_str, 'weight': average_weight})
+                        conn.commit()
+                    update_query_1 = text("INSERT INTO weight_records (date, weight) Values (:date, :weight)")
+                    conn.execute(update_query_1, {'date':today_date_str, 'weight':weight})
+                    conn.commit()
+                    return f'Weight recorded for {today_date_str}: {weight} kg! All Missing Weight Updated!'
+
+                elif days_missing == 1:
+                    update_query_2 = text("INSERT INTO weight_records (date, weight) Values (:date, :weight)")
+                    conn.execute(update_query_2, {'date':today_date_str, 'weight':weight})
+                    conn.commit()
+                    return f'Weight recorded for {today_date_str}: {weight} kg!'
+                
+                elif today_record:
+                    update_query_3 = text("UPDATE weight_records SET weight = :weight WHERE date = :today_date")
+                    conn.execute(update_query_3, {'today_date': today_date_str, 'weight': weight})
+                    conn.commit()
+                    return f'Weight updated for {today_date_str}: {weight} kg!'
+
         except Exception as e:
-            conn.close()
             return f'An error occurred: {e}'
-        
-    return 'Record Weight Please! My Lord!'
+    else:
+        return 'Record Weight Please! My Lord!'
 
 # Callbacks to displays the last recorded weight, date, and the number of days recorded
 @app.callback(
@@ -371,7 +382,7 @@ def get_current_avg(n):
         query = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
         df = pd.read_sql(query, conn)
     avg_weights = df['weight'].mean()
-    avg_weights = format(avg_weights, '.1f')
+    avg_weights = format(avg_weights, '.2f')
     return f'Current Week Average: {avg_weights}kg'
 
 # Callback to display last weekly average weight
@@ -384,8 +395,75 @@ def get_last_avg(n):
         query = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
         df = pd.read_sql(query, conn)
     avg_weights = df['weight'].mean()
-    avg_weights = format(avg_weights, '.1f')
+    avg_weights = format(avg_weights, '.2f')
     return f'Last Week Average: {avg_weights}kg'
+
+# Callback to display Difference between last week and this week
+@app.callback(
+    Output('weight-diff', 'children'),
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def get_weight_diff(n):
+    with engine.connect() as conn:
+        query_last = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
+        df_last = pd.read_sql(query_last, conn)
+        query_current = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
+        df_current = pd.read_sql(query_current, conn)
+    avg_weights_last = df_last['weight'].mean()
+    avg_weights_current = df_current['weight'].mean()
+    weight_diff = avg_weights_current-avg_weights_last
+    weight_diff_display = format(abs(weight_diff), '.2f')
+    if weight_diff <0:
+        return f'You Have Lost: {weight_diff_display}kg Comparing to Last Week! Nice!'
+    elif weight_diff >0:
+        return f'You Have Gained: {weight_diff_display}kg Comparing to Last Week!'
+    else:
+        return f'No Difference Comparing to Last Week! Maintaining~'
+    
+# Callback to Display Caloric Status
+@app.callback(
+    Output('calorie-status', 'children'),
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def get_caloric_status(n):
+    with engine.connect() as conn:
+        query_last = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
+        df_last = pd.read_sql(query_last, conn)
+        query_current = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
+        df_current = pd.read_sql(query_current, conn)
+    avg_weights_last = df_last['weight'].mean()
+    avg_weights_current = df_current['weight'].mean()
+    weight_diff = avg_weights_current-avg_weights_last
+    daily_calorie = abs(weight_diff)*7700/7
+    daily_calorie_display = format(abs(daily_calorie), '.0f')
+    if weight_diff <0:
+        return f'Estimated Daily Caloric Deficit: {daily_calorie_display}Kcal'
+    elif weight_diff >0:
+        return f'Estimated Daily Caloric Surplus: {daily_calorie_display}Kcal'
+    else:
+        return f'No Difference Comparing to Last Week! Maintaining~'
+    
+# Callback to Display Advice
+@app.callback(
+    Output('advice', 'children'),
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def advice(n):
+    with engine.connect() as conn:
+        query_last = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
+        df_last = pd.read_sql(query_last, conn)
+        query_current = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
+        df_current = pd.read_sql(query_current, conn)
+    avg_weights_last = df_last['weight'].mean()
+    avg_weights_current = df_current['weight'].mean()
+    weight_diff = avg_weights_current-avg_weights_last
+    weight_diff_abs = abs(weight_diff)
+    if weight_diff <0 and weight_diff_abs<0.5:
+        return f'Advice: Losing Weight, but not Enough, COME ON Eric!' 
+    elif weight_diff <0 and weight_diff_abs>=0.5:
+        return f'Advice: Good Job My Lord! You Are The God!'
+    elif weight_diff >=0:
+        return f'Advice: What Are You Doing?? Stop Eating Crap!!!'
 
 # Callback to display all weight trend plot
 @app.callback(
@@ -442,6 +520,7 @@ def update_graph(n):
         yaxis_title='Weekly Average Weight (kg)',
         margin=dict(t=10, l=0, r=0, b=0)
     )
+    fig.update_layout(yaxis=dict(range=[81,87]))
     return fig
 
 # Callback to display weekly average for past year
@@ -503,62 +582,111 @@ def update_graph(n):
         yaxis_title='Weight (kg)',
         margin=dict(t=10, l=0, r=0, b=0)
     )
+    fig.update_layout(yaxis=dict(range=[81,87]))
     return fig
 
-# Callback to display daily weight for past week
+# Callback to display daily weight for Current Week
 @app.callback(
-    Output('daily-weight-week', 'figure'),
+    Output('daily-weight-current-week', 'figure'),
     [Input('interval-component', 'n_intervals')]
 )
 def update_graph(n):
     with engine.connect() as conn:
-        query = "SELECT date, weight FROM weight_records WHERE date >= current_date - interval '1 week' ORDER BY date"
+        # Calculate the start of the current week (Monday)
+        start_of_week = datetime.now().date() - timedelta(days=datetime.now().weekday())
+        query = f"SELECT date, weight FROM weight_records WHERE date >= '{start_of_week}' ORDER BY date"
         df = pd.read_sql(query, conn)
-    fig = px.line(df, x='date', y='weight')
+        df['date'] = pd.to_datetime(df['date'])
+    # Create a DataFrame for the entire week
+    week_dates = pd.date_range(start=start_of_week, periods=7, freq='D')
+    df_week = pd.DataFrame(week_dates, columns=['date']).merge(df, on='date', how='left')
+    # Plotting
+    fig = px.line(df_week, x='date', y='weight')
     fig.update_layout(
         xaxis_title='',
         yaxis_title='Weight (kg)',
-        margin=dict(t=10, l=0, r=0, b=0)
+        margin=dict(t=10, l=0, r=0, b=0),
+        xaxis=dict(tickformat='%a')
     )
+    fig.update_layout(yaxis=dict(range=[84,86.5]))
     return fig
 
-# Callback to display daily weight for past 6 weeks
+# Callback to display daily weight for Last Week
 @app.callback(
-    Output('daily-weight-6weeks', 'figure'),
+    Output('daily-weight-last-week', 'figure'),
     [Input('interval-component', 'n_intervals')]
 )
 def update_graph(n):
     with engine.connect() as conn:
-        query = "SELECT date, weight FROM weight_records WHERE date >= current_date - interval '6 weeks' ORDER BY date"
+        # Calculate the start of the last week (previous Monday)
+        today = datetime.now().date()
+        start_of_last_week = today - timedelta(days=today.weekday() + 7)  # Subtract current weekday + 7 days
+        end_of_last_week = start_of_last_week + timedelta(days=6)  # Last day of the last week (Sunday)
+
+        # SQL query to get weights from the last week
+        query = f"SELECT date, weight FROM weight_records WHERE date >= '{start_of_last_week}' AND date <= '{end_of_last_week}' ORDER BY date"
         df = pd.read_sql(query, conn)
-    fig = px.line(df, x='date', y='weight')
+        df['date'] = pd.to_datetime(df['date'])
+
+    # Create a DataFrame for the entire last week
+    last_week_dates = pd.date_range(start=start_of_last_week, periods=7, freq='D')
+    df_last_week = pd.DataFrame(last_week_dates, columns=['date']).merge(df, on='date', how='left')
+
+    # Plotting
+    fig = px.line(df_last_week, x='date', y='weight')
     fig.update_layout(
         xaxis_title='',
         yaxis_title='Weight (kg)',
-        margin=dict(t=10, l=0, r=0, b=0)
+        margin=dict(t=10, l=0, r=0, b=0),
+        xaxis=dict(tickformat='%a')  # Format x-axis labels to show day of the week
     )
+    fig.update_layout(yaxis=dict(range=[84,86.5]))
     return fig
 
-# Callback to display weekly average for past 6 weeks
+# Callback to display weekly average for past 5 weeks including current week
 @app.callback(
     Output('weekly-avg-6weeks', 'figure'),
     [Input('interval-component', 'n_intervals')]
 )
 def update_graph(n):
     with engine.connect() as conn:
-        query = "SELECT date, weight FROM weight_records WHERE date >= current_date - interval '6 weeks' ORDER BY date"
+        # Calculate the start of the week five weeks ago
+        today = datetime.now().date()
+        start_of_five_weeks_ago = today - timedelta(days=today.weekday() + 35)
+
+        # SQL query to get weights from the last five weeks
+        query = f"SELECT date, weight FROM weight_records WHERE date >= '{start_of_five_weeks_ago}' ORDER BY date"
         df = pd.read_sql(query, conn)
-    df['date'] = pd.to_datetime(df['date'])
-    df.sort_values('date', inplace=True)
-    df.set_index('date', inplace=True)
-    weekly_averages = df['weight'].resample('W').mean().reset_index()
-    weekly_averages['week'] = weekly_averages['date'].dt.strftime('Week %U')
-    fig = px.line(weekly_averages, x='week', y='weight')
+        df['date'] = pd.to_datetime(df['date'])
+
+    # Determine the current week number
+    current_week_number = (today - start_of_five_weeks_ago).days // 7 + 1
+
+    # Calculate the relative week number
+    df['relative_week'] = ((df['date'] - pd.Timestamp(start_of_five_weeks_ago)).dt.days // 7) + 1
+
+    # Map the relative week number to custom labels
+    week_labels = {i: f"Week {i}" for i in range(1, current_week_number)}
+    week_labels[current_week_number] = "Current"
+    df['week_label'] = df['relative_week'].map(week_labels)
+
+    # Group by relative week and calculate weekly average
+    df_weekly_avg = df.groupby('week_label')['weight'].mean().reset_index()
+
+    # Ensure the order is Week 1 to Week 5, then Current Week
+    ordered_labels = [f"Week {i}" for i in range(1, current_week_number)] + ["Current"]
+    df_weekly_avg['week_label'] = pd.Categorical(df_weekly_avg['week_label'], categories=ordered_labels, ordered=True)
+    df_weekly_avg.sort_values('week_label', inplace=True)
+
+    # Plotting
+    fig = px.line(df_weekly_avg, x='week_label', y='weight')
     fig.update_layout(
         xaxis_title='',
-        yaxis_title='Weekly Average Weight (kg)',
-        margin=dict(t=10, l=0, r=0, b=0)
+        yaxis_title='Average Weight (kg)',
+        margin=dict(t=10, l=0, r=0, b=0),
+        xaxis=dict(tickangle=45)
     )
+    fig.update_layout(yaxis=dict(range=[84,86.5]))
     return fig
 
 # Run the app
