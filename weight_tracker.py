@@ -13,9 +13,12 @@ import dash_bootstrap_components as dbc
 
 # This is to load local environmental variables for testing the application
 # load_dotenv()
+# database_url = os.getenv('DATABASE_URL')
+
+# for deployment
+database_url = os.environ.get('DATABASE_URL')
 
 # Connect to database
-database_url = os.getenv('DATABASE_URL')
 engine = create_engine(database_url)
 
 # Initialize Dash app
