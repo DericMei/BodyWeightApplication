@@ -17,6 +17,10 @@ import dash_bootstrap_components as dbc
 
 # for deployment
 database_url = os.environ.get('DATABASE_URL')
+# Check if the URL starts with "postgres://" this is a weird error with postgresql on heroku
+if database_url.startswith('postgres://'):
+    # Replace it with "postgresql://"
+    database_url = 'postgresql://' + database_url[len('postgres://'):]
 
 # Connect to database
 engine = create_engine(database_url)
