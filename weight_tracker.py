@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 import dash_bootstrap_components as dbc
 
 # This is to load local environmental variables for testing the application
-load_dotenv()
+# load_dotenv()
 
 # Connect to database
 database_url = os.getenv('DATABASE_URL')
