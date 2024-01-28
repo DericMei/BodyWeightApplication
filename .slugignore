@@ -1,0 +1,14 @@
+# Ignore all .psd and .pdf files
+*.psd
+*.pdf
+
+# Ignore all files in the spec directory
+/spec/
+
+bodyweight 2.csv
+bodyweight.csv
+my_weight_tracker.db
+Project Code.ipynb
+model_from_db.pkl
+README.md
+best_prophet_model.pkl
