@@ -48,7 +48,6 @@ def load_model():
         fetch_query = text("SELECT model_data FROM models ORDER BY training_date DESC LIMIT 1")
         result = conn.execute(fetch_query)
         model_data = result.fetchone()[0]
-        model_data = pickle.loads(model_data)
         model = pickle.loads(model_data)
         return model
 
