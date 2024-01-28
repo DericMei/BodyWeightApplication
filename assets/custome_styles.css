@@ -14,5 +14,47 @@
 }
 
 .card-body {
-    padding: 15px; /* Padding inside the card body */
+    padding: 10px; /* Padding inside the card body */
+}
+
+/* Style for dropdown */
+.Select-control, .Select-menu-outer {
+    border-radius: 10px; /* Match border radius of card */
+    border: 1px solid #cccccc; /* Light border for dropdown */
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.Select-control {
+    background-color: white; /* Background color for dropdown */
+}
+
+.Select-menu-outer {
+    z-index: 1000; /* Ensure dropdown menu is above other content */
+    box-shadow: 0 4px 8px #004d99; /* Optional: add shadow to dropdown menu */
+}
+
+/* Style for dropdown options */
+.VirtualizedSelectOption {
+    color: #333; /* color for dropdown options text */
+}
+
+/* Style for the selected option in the dropdown */
+.VirtualizedSelectFocusedOption {
+    color: #0478ed; /* color for selected dropdown option text */
+}
+
+/* button */
+.custom-button {
+    background-color: #0c74dbb6; 
+    color: whitesmoke;            
+    border-radius: 10px;       /* Rounded corners */
+    border: none;              /* No border */
+    box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.custom-button:hover {
+    background-color: #0478ed; 
+    color: white;
 }
