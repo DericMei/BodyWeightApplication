@@ -2,10 +2,10 @@
 #### Import necessary libraries ####
 ####################################
 import dash
-from dash import html, dcc, Input, Output, State, dash_table
+from dash import html, dcc, Input, Output, State #, dash_table
 import plotly.express as px
 import pandas as pd
-import numpy as np
+#import numpy as np
 import os
 from datetime import datetime, timedelta
 from pandas.tseries.offsets import MonthEnd
@@ -16,24 +16,24 @@ import dash_bootstrap_components as dbc
 from prophet import Prophet
 import plotly.graph_objs as go
 import pickle
-import torch.nn as nn
-import joblib
-import torch
+#import torch.nn as nn
+#import joblib
+#import torch
 
 
 ########################
 #### Database Setup ####
 ########################
 # This part is to load local environmental variables for testing the application
-#load_dotenv()
-#database_url = os.getenv('DATABASE_URL')
+load_dotenv()
+database_url = os.getenv('DATABASE_URL')
 
 # This Part is for deployment purposes to connect the database
-database_url = os.environ.get('DATABASE_URL')
+#database_url = os.environ.get('DATABASE_URL')
 # Check if the URL starts with "postgres://" this is a weird error with postgresql on heroku
-if database_url.startswith('postgres://'):
+#if database_url.startswith('postgres://'):
     # Replace it with "postgresql://"
-    database_url = 'postgresql://' + database_url[len('postgres://'):]
+    #database_url = 'postgresql://' + database_url[len('postgres://'):]
 
 # Connect to database
 engine = create_engine(database_url)
@@ -51,7 +51,9 @@ def load_model():
         model_data = pickle.loads(model_data)
         model = pickle.loads(model_data)
         return model
-    
+
+'''
+# Due to the fact that torch is too big, I cant deploy this to heroku
 # Redefine the same LSTMModel
 class LSTMModel(nn.Module):
     def __init__(self, input_dim, hidden_dims, output_dim=1, num_layers=1, dropout_prob=0.5):
@@ -148,6 +150,8 @@ model_lstm.eval()
 
 # Load the saved scaler
 scaler = joblib.load('weight_scaler.pkl')
+
+'''
 
 #############################################################
 #############################################################
@@ -435,16 +439,7 @@ app.layout = dbc.Container([
     dbc.Card([
         dbc.CardHeader([
             dbc.Row([
-                dbc.Col(
-                    dcc.Dropdown(
-                        id='machine-learning-dropdown',
-                        options=[
-                            {'label': 'Facebook Prophet Model', 'value': 'prophet'},
-                            {'label': 'LSTM Model', 'value': 'lstm'},
-                        ],
-                        value='prophet', className='text-left'
-                    )
-                , width=2),
+                dbc.Col('', width=2),
                 dbc.Col(html.H2(html.Strong('Machine Learning Insights'), className='text-center'), width=8, className='my-auto'),
                 dbc.Col('', width=2, className='text-end')
             ], className='align-items-center')
@@ -546,37 +541,7 @@ app.layout = dbc.Container([
                     ]),
                 ], width=7)
             ]),
-        ], style={'display': 'block'}),
-        dbc.CardBody(id='lstm-body', children=[
-            dbc.Row([
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader([
-                            html.H4('Predictions For Next 10 Days', className='text-center'),
-                        ]),
-                        dbc.CardBody(
-                            dash_table.DataTable(
-                                id='lstm-table', 
-                                style_table={'height': '450px', 'overflowY': 'auto'},
-                                style_header={'textAlign': 'center','padding': '14px','verticalAlign': 'middle', 'fontWeight': 'bold', 'fontSize': '25px'},
-                                style_data={'textAlign': 'center','padding': '14px','verticalAlign': 'middle', 'fontWeight': 'bold', 'fontSize': '20px'},
-
-                            )
-                        ,className='text-center')
-                    ]),
-                ],width=3),
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader([
-                            html.H4('Prediction Plot Comparing to Original Weights by LSTM', className='text-center'),
-                        ]),
-                        dbc.CardBody(
-                            dcc.Graph(id='lstm-plot', style={'padding': '0px', 'margin': '0px'})
-                        )
-                    ]),
-                ],width=9)
-            ])
-        ], style={'display': 'none'})
+        ], style={'display': 'block'})
     ]),
 
 ], fluid=True)
@@ -1235,6 +1200,7 @@ def update_graph_weekly_avg(selected_value):
         return fig
 
 # Callbacks for Machine Learning Part
+'''
 # Callback to switch between 2 models
 @app.callback(
     [Output('prophet-body', 'style'),
@@ -1246,6 +1212,7 @@ def toggle_card_bodies(selected_value):
         return {'display': 'block'}, {'display': 'none'}
     elif selected_value == 'lstm':
         return {'display': 'none'}, {'display': 'block'}
+'''
 
 # Callback for Machine Learning trend plots
 @app.callback(
@@ -1417,6 +1384,7 @@ def update_message(n_clicks, n):
 
         return "Training Complete!"
 
+'''
 # LSTM part
 # Callback to generate prediction table
 @app.callback(
@@ -1481,6 +1449,7 @@ def update_graph(n_intervals):
         hovermode='x unified'
     )
     return fig
+'''
 
 # Run the app
 if __name__ == '__main__':
