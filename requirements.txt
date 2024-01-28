@@ -134,6 +134,7 @@ werkzeug==3.0.1
     #   flask
 zipp==3.17.0
     # via importlib-metadata
+gunicorn
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
