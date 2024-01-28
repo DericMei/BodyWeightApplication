@@ -25,15 +25,15 @@ import pickle
 #### Database Setup ####
 ########################
 # This part is to load local environmental variables for testing the application
-load_dotenv()
-database_url = os.getenv('DATABASE_URL')
+#load_dotenv()
+#database_url = os.getenv('DATABASE_URL')
 
 # This Part is for deployment purposes to connect the database
-#database_url = os.environ.get('DATABASE_URL')
+database_url = os.environ.get('DATABASE_URL')
 # Check if the URL starts with "postgres://" this is a weird error with postgresql on heroku
-#if database_url.startswith('postgres://'):
+if database_url.startswith('postgres://'):
     # Replace it with "postgresql://"
-    #database_url = 'postgresql://' + database_url[len('postgres://'):]
+    database_url = 'postgresql://' + database_url[len('postgres://'):]
 
 # Connect to database
 engine = create_engine(database_url)
