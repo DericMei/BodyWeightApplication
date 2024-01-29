@@ -51,9 +51,10 @@ The main objective for this project is to build a comprehensive body weight anal
     - It also predicts my body weight for today, just for fun, it is not accurate at all and I don't really need it.
     - It has a training button which can only be seen on the correct password entry which can retrain the prophet model with newest data available.
     - It also has a section with some personal links.
-    
+
 **Here is a GIF Demo of the webpage:**
-<img src="https://raw.githubusercontent.com/DericMei/First-Trial/main/weight.JPG" width="600" height="400"/>
+
+<img src="https://raw.githubusercontent.com/DericMei/BodyWeightApplication/main/demo.gif">
 
 ## Project Summary
 Eric Mei's "Body Weight Magic Tool" is an innovative web-based application developed for automated body weight analysis. It's a comprehensive tool, deployed on Heroku, with a PostgreSQL database backend, designed for desktop browsers. This project is a testament to my journey in personal fitness and skills in data science and web development. It serves as a personalized, automated body weight analysis and tracking tool, showcasing practical application of machine learning and data visualization in personal health management.
@@ -170,6 +171,7 @@ For future refrences, I am not going to list all files in the repository since s
 - weight_tracker.py (this is the dash web application python file)
 - Project Code.ipynb (this is the jupyter notebook file I have alone with the python file to support the main design of this application, including database creation, data cleaning, EDA and so much more)
 - custome_styles.css (this is the css file that supports the web application for styles design)
+- demo.gif (this is the demo you saw on top of this page)
 
 ## Usage
 Feel free to check out the web based application and look around, it will always have my newest body weight data available because I will use it on a daily basis.
