@@ -732,7 +732,15 @@ def get_week_info(n):
 )
 def get_current_avg(n):
     with engine.connect() as conn:
-        query = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
+        today = datetime.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week_str = start_of_week.strftime('%Y-%m-%d')
+        query = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_week_str}'
+                ORDER BY date
+                """
         df = pd.read_sql(query, conn)
     avg_weights = df['weight'].mean()
     avg_weights = format(avg_weights, '.2f')
@@ -744,8 +752,18 @@ def get_current_avg(n):
     [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
 )
 def get_last_avg(n):
+    today = datetime.today()
+    start_of_last_week = today - timedelta(days=today.weekday() + 7)
+    end_of_last_week = start_of_last_week + timedelta(days=6)
+    start_of_last_week_str = start_of_last_week.strftime('%Y-%m-%d')
+    end_of_last_week_str = end_of_last_week.strftime('%Y-%m-%d')
     with engine.connect() as conn:
-        query = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
+        query = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_last_week_str}' AND date <= '{end_of_last_week_str}'
+                ORDER BY date
+                """
         df = pd.read_sql(query, conn)
     avg_weights = df['weight'].mean()
     avg_weights = format(avg_weights, '.2f')
@@ -758,10 +776,30 @@ def get_last_avg(n):
 )
 def get_weight_diff(n):
     with engine.connect() as conn:
-        query_last = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
-        df_last = pd.read_sql(query_last, conn)
-        query_current = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
+        # Get current week df
+        today = datetime.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week_str = start_of_week.strftime('%Y-%m-%d')
+        query_current = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_week_str}'
+                ORDER BY date
+                """
         df_current = pd.read_sql(query_current, conn)
+        # Get last week df
+        today = datetime.today()
+        start_of_last_week = today - timedelta(days=today.weekday() + 7)
+        end_of_last_week = start_of_last_week + timedelta(days=6)
+        start_of_last_week_str = start_of_last_week.strftime('%Y-%m-%d')
+        end_of_last_week_str = end_of_last_week.strftime('%Y-%m-%d')
+        query_last = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_last_week_str}' AND date <= '{end_of_last_week_str}'
+                ORDER BY date
+                """
+        df_last = pd.read_sql(query_last, conn)
     avg_weights_last = df_last['weight'].mean()
     avg_weights_current = df_current['weight'].mean()
     weight_diff = avg_weights_current-avg_weights_last
@@ -775,10 +813,30 @@ def get_weight_diff(n):
 )
 def get_caloric_amount(n):
     with engine.connect() as conn:
-        query_last = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
-        df_last = pd.read_sql(query_last, conn)
-        query_current = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
+        # Get current week df
+        today = datetime.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week_str = start_of_week.strftime('%Y-%m-%d')
+        query_current = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_week_str}'
+                ORDER BY date
+                """
         df_current = pd.read_sql(query_current, conn)
+        # Get last week df
+        today = datetime.today()
+        start_of_last_week = today - timedelta(days=today.weekday() + 7)
+        end_of_last_week = start_of_last_week + timedelta(days=6)
+        start_of_last_week_str = start_of_last_week.strftime('%Y-%m-%d')
+        end_of_last_week_str = end_of_last_week.strftime('%Y-%m-%d')
+        query_last = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_last_week_str}' AND date <= '{end_of_last_week_str}'
+                ORDER BY date
+                """
+        df_last = pd.read_sql(query_last, conn)
     avg_weights_last = df_last['weight'].mean()
     avg_weights_current = df_current['weight'].mean()
     weight_diff = avg_weights_current-avg_weights_last
@@ -794,10 +852,30 @@ def get_caloric_amount(n):
 )
 def get_caloric_status(n):
     with engine.connect() as conn:
-        query_last = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) - interval '1 week' AND date < date_trunc('week', current_date) ORDER BY date"
-        df_last = pd.read_sql(query_last, conn)
-        query_current = "SELECT date, weight FROM weight_records WHERE date>=date_trunc('week', current_date) ORDER BY date"
+        # Get current week df
+        today = datetime.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week_str = start_of_week.strftime('%Y-%m-%d')
+        query_current = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_week_str}'
+                ORDER BY date
+                """
         df_current = pd.read_sql(query_current, conn)
+        # Get last week df
+        today = datetime.today()
+        start_of_last_week = today - timedelta(days=today.weekday() + 7)
+        end_of_last_week = start_of_last_week + timedelta(days=6)
+        start_of_last_week_str = start_of_last_week.strftime('%Y-%m-%d')
+        end_of_last_week_str = end_of_last_week.strftime('%Y-%m-%d')
+        query_last = f"""
+                SELECT date, weight 
+                FROM weight_records 
+                WHERE date >= '{start_of_last_week_str}' AND date <= '{end_of_last_week_str}'
+                ORDER BY date
+                """
+        df_last = pd.read_sql(query_last, conn)
     avg_weights_last = df_last['weight'].mean()
     avg_weights_current = df_current['weight'].mean()
     weight_diff = avg_weights_current-avg_weights_last
