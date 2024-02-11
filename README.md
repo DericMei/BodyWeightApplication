@@ -1,9 +1,36 @@
-# **Body Weight Magic Application**
-The **BEST** project I have ever done so far! By utilizing machine learning tools, exploratory analysis, and dash, I built a web-based application deployed by Heroku and running a PostgreSQL database in the background, to automate my entire body weight analysis for me! Check it out: 
+# **Fitness Magic Application**
+The **BEST** project I have ever done so far! By utilizing machine learning tools, exploratory analysis, and dash, I built a web-based application deployed by Heroku and running a PostgreSQL database in the background, to automate my entire Fitness analysis for me! Check it out: 
 
-[Eric Mei's Body Weight Magic Tool](https://bodyweightapp-f5c3d823ac56.herokuapp.com/). 
+[Eric Mei's Fitness Magic Tool](https://bodyweightapp-f5c3d823ac56.herokuapp.com/). 
 
 (Notice this web-based application is designed only for desktop browsers, layout will not look well in smartphones)
+
+## Major Update (02-11-2024)
+Exciting news! After spending another 30-40 hours or so, I managed to update my body weight magic tool to my fitness magic tool! I intergraded my workout data into the application, now it can run auto analysis on my workouts as well, which makes it a comprehensive personal fitness analytics tool! Here is a breakdown of the updates:
+1. Changed application name to Fitness Magic Application
+2. Added another section in tracking information for training
+3. Added another section in weekly summary for training
+4. Added the function to record workouts after entering password
+5. Added a new section for training data visualization.
+6. Recorded a new Demo for the application.
+
+(Side Note: I've been having a cold for 2 weeks at the time of this update, so you will not see current week summaries for lifting data because I did not go to the gym for 2 weeks!)
+
+
+**Here is the updated GIF Demo of the webpage application:**
+<img src="https://raw.githubusercontent.com/DericMei/First-Trial/main/demo-update.gif">
+
+**Some Background Knowledge on the Update:**    
+I have been weightlifting ever since I started to lose weight back in 2014. Unfortunately, I injured my lower back a little during my initial training years due to ego deadlifting, as a result, I decided to abandon lower body training about 2 years ago.  
+
+For upper body training, I cycle through push (chest) and pull (back) 2 times a week, and the main compound exercise for these 2 workout routines are Bench Press and Chin Up. This is the reason why you can only see data for these 2 exercises on my application. The reason behind is that by only seriously tracking the process on these 2 compound movements over time, I can easily know my progress.
+
+Unlike losing weight, gaining muscle is a much slower process and it takes years. And unfortunately, for most people, including myself, after a few initial training years, progress can slow down even more until a point there you can't see clear progress at all. This is where I am at. I have been training for 10 years, and in my opinion, I am almost at 80% or even more of my genetic potentials for natural lifting. However, it still doesn't stop me from tracking my progress.
+
+If you don't do weightlifting, you might find some unfamiliar terms in the application, such as one rep max or load. Here is a brief explanation:
+- One-Rep-Max: The one-repetition maximum (one rep max or 1RM) is the heaviest weight one can lift for a single repetition of a given exercise. I never actually tested my one rep max ever, since it is not productive or safe, but there is a easy calculation method where you can just take the heaviest working set of a given day and use the weight and reps of that set to calculate. That is what is going on behind the scenes for all the one rep max calculations in the application.
+- Load: Load is just a measurement of the total work being done for a given exercise, using the formula of Total Working Sets times Weight lifted for those sets times Reps lifted for those sets. It is a better and more accurate measure for progress.
+
 
 ## Introduction/Background
 I was fat for as long as I could remember before 2014, my body weight was constantly over 230lbs and reached a peak over 250lbs in the year of 2014. That’s when I finally decided to lose weight.

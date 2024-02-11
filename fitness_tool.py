@@ -25,15 +25,15 @@ import pickle
 #### Database Setup ####
 ########################
 # This part is to load local environmental variables for testing the application
-#load_dotenv()
-#database_url = os.getenv('DATABASE_URL')
+load_dotenv()
+database_url = os.getenv('DATABASE_URL')
 
 # This Part is for deployment purposes to connect the database
-database_url = os.environ.get('DATABASE_URL')
+#database_url = os.environ.get('DATABASE_URL')
 # Check if the URL starts with "postgres://" this is a weird error with postgresql on heroku
-if database_url.startswith('postgres://'):
+#if database_url.startswith('postgres://'):
     # Replace it with "postgresql://"
-    database_url = 'postgresql://' + database_url[len('postgres://'):]
+    #database_url = 'postgresql://' + database_url[len('postgres://'):]
 
 # Connect to database
 engine = create_engine(database_url)
@@ -176,79 +176,164 @@ app.layout = dbc.Container([
 
     # Title Section of the application
     dbc.Card([
-        dbc.CardHeader(html.H1(html.Strong("Eric Mei's BodyWeight Magic!"), className='text-center'), style={'background-color': '#000080'}),
+        dbc.CardHeader(html.H1(html.Strong("Eric Mei's Fitness Magic!"), className='text-center'), style={'background-color': '#000080'}),
         dbc.CardBody([
             # Basic Info
             dbc.Row([
-                dbc.Col(
+                dbc.Col([
                     dbc.Card([
-                        dbc.CardHeader(html.H4(html.Strong("Weight Tracking Informations"), className='text-center')),
+                        dbc.CardHeader(html.H3(html.Strong("Tracking Informations"), className='text-center')),
                         dbc.CardBody([
                             dbc.Card([
+                                dbc.CardHeader(html.H4(html.Strong("Weight"), className='text-center')),
                                 dbc.CardBody([
-                                    html.Table(
-                                        [html.Tbody(html.Tr([
-                                            html.Td(html.H4('Last Recorded Date:'), style={'padding-right': '30px'}), 
-                                            html.Td(html.H4(id='last-recorded-date'), style={'color': '#FF7F50'}),
-                                        ]))] +
-                                        [html.Tbody(html.Tr([
-                                            html.Td(html.H4('Last Recorded Weight:'), style={'padding-right': '30px'}), 
-                                            html.Td(html.H4(id='last-recorded-weight'), style={'color': '#FF7F50'})
-                                        ]))] +
-                                        [html.Tbody(html.Tr([
-                                            html.Td(html.H4(id='days-recording-text'), style={'padding-right': '30px'}), 
-                                            html.Td(html.H4(id='days-recording'), style={'color': '#FF7F50'})
-                                        ]))]
-                                    , className= 'text-left')
+                                    dbc.Card([
+                                        dbc.CardBody([
+                                            html.Table(
+                                                [html.Tbody(html.Tr([
+                                                    html.Td(html.H4('Last Recorded Date:'), style={'padding-right': '30px'}), 
+                                                    html.Td(html.H4(id='last-recorded-date'), style={'color': '#FF7F50'}),
+                                                ]))] +
+                                                [html.Tbody(html.Tr([
+                                                    html.Td(html.H4('Last Recorded Weight:'), style={'padding-right': '30px'}), 
+                                                    html.Td(html.H4(id='last-recorded-weight'), style={'color': '#FF7F50'})
+                                                ]))] +
+                                                [html.Tbody(html.Tr([
+                                                    html.Td(html.H4(id='days-recording-text'), style={'padding-right': '30px'}), 
+                                                    html.Td(html.H4(id='days-recording'), style={'color': '#FF7F50'})
+                                                ]))]
+                                            , className= 'text-left')
+                                        ])
+                                    ])
                                 ])
-                            ])
+                            ]),
+                            html.Div(style={'height': '7px'}),
+                            dbc.Card([
+                                dbc.CardHeader(html.H4(html.Strong("Training"), className='text-center')),
+                                dbc.CardBody([
+                                    dbc.Card([
+                                        dbc.CardBody([
+                                            html.Table(
+                                                [html.Tbody(html.Tr([
+                                                    html.Td(html.H4('Last Training Date:'), style={'padding-right': '30px'}), 
+                                                    html.Td(html.H4(id='last-training-date'), style={'color': '#FF7F50'}),
+                                                ]))] +
+                                                [html.Tbody(html.Tr([
+                                                    html.Td(html.H4('Bench PR 1-Rep-Max:'), style={'padding-right': '30px'}), 
+                                                    html.Td(html.H4(id='bench-pr-1rm'), style={'color': '#FF7F50'})
+                                                ]))] +
+                                                [html.Tbody(html.Tr([
+                                                    html.Td(html.H4('ChinUp PR 1-Rep-Max:'), style={'padding-right': '30px'}), 
+                                                    html.Td(html.H4(id='chinup-pr-1rm'), style={'color': '#FF7F50'})
+                                                ]))]
+                                            , className= 'text-left')
+                                        ])
+                                    ]) 
+                                ])
+                            ]),
                         ])
-                    ]), width=4),
+                    ]),
+                ], width=4),
                 dbc.Col(
                     dbc.Card([
-                        dbc.CardHeader(html.H4(html.Strong("Weekly Summary"), className='text-center')),
+                        dbc.CardHeader(html.H3(html.Strong("Weekly Summary"), className='text-center')),
                         dbc.CardBody([
-                            dbc.Row([
-                                dbc.Col([
-                                    dbc.Card([
-                                        dbc.CardBody([
-                                            html.Table(
-                                                [html.Tbody(html.Tr([
-                                                    html.Td(html.H4("Today's Date:"), style={'padding-right': '20px'}), 
-                                                    html.Td(html.H4(id='week-status'), style={'color': '#FF7F50'}),
-                                                ]))] +
-                                                [html.Tbody(html.Tr([
-                                                    html.Td(html.H4("Last Week's Avg:"), style={'padding-right': '20px'}), 
-                                                    html.Td(html.H4(id='past-week'), style={'color': '#FF7F50'})
-                                                ]))] +
-                                                [html.Tbody(html.Tr([
-                                                    html.Td(html.H4("Current Week's Avg:"), style={'padding-right': '20px'}), 
-                                                    html.Td(html.H4(id='current-week'), style={'color': '#FF7F50'})
-                                                ]))]
-                                            , className= 'text-left')
+                            dbc.Col([
+                                dbc.Card([
+                                    dbc.CardHeader(html.H4(html.Strong("Weight"), className='text-center')),
+                                    dbc.CardBody([
+                                        dbc.Row([
+                                            dbc.Col([
+                                                dbc.Card([
+                                                    dbc.CardBody([
+                                                        html.Table(
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Today's Date:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='week-status'), style={'color': '#FF7F50'}),
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Last Week's Avg:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='past-week'), style={'color': '#FF7F50'})
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Current Week's Avg:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='current-week'), style={'color': '#FF7F50'})
+                                                            ]))]
+                                                        , className= 'text-left')
+                                                    ])
+                                                ])
+                                            ], width=6),
+                                            dbc.Col([
+                                                dbc.Card([
+                                                    dbc.CardBody([
+                                                        html.Table(
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Current Week Caloric Status:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='caloric-status'), style={'color': '#FF7F50'}),
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Weekly Avg Net Change:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='weight-diff'), style={'color': '#FF7F50'})
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Estimated Daily Caloric Status:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='calorie-amount'), style={'color': '#FF7F50'})
+                                                            ]))]
+                                                        , className= 'text-left')
+                                                    ])
+                                                ])
+                                            ], width=6),
                                         ])
                                     ])
-                                ], width=5),
-                                dbc.Col([
-                                    dbc.Card([
-                                        dbc.CardBody([
-                                            html.Table(
-                                                [html.Tbody(html.Tr([
-                                                    html.Td(html.H4("Current Week Caloric Status:"), style={'padding-right': '20px'}), 
-                                                    html.Td(html.H4(id='caloric-status'), style={'color': '#FF7F50'}),
-                                                ]))] +
-                                                [html.Tbody(html.Tr([
-                                                    html.Td(html.H4("Weekly Avg Net Change:"), style={'padding-right': '20px'}), 
-                                                    html.Td(html.H4(id='weight-diff'), style={'color': '#FF7F50'})
-                                                ]))] +
-                                                [html.Tbody(html.Tr([
-                                                    html.Td(html.H4("Estimated Daily Caloric Status:"), style={'padding-right': '20px'}), 
-                                                    html.Td(html.H4(id='calorie-amount'), style={'color': '#FF7F50'})
-                                                ]))]
-                                            , className= 'text-left')
+                                ]),
+                                html.Div(style={'height': '7px'}),
+                                dbc.Card([
+                                    dbc.CardHeader(html.H4(html.Strong("Training"), className='text-center')),
+                                    dbc.CardBody([
+                                        dbc.Row([
+                                            dbc.Col([
+                                                dbc.Card([
+                                                    dbc.CardBody([
+                                                        html.Table(
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Bench Peak Set:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='bench-peak-set'), style={'color': '#FF7F50'}),
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Bench Peak 1-Rep-Max:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='bench-peak-1rm'), style={'color': '#FF7F50'})
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("Bench Peak Load:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='bench-peak-load'), style={'color': '#FF7F50'})
+                                                            ]))]
+                                                        , className= 'text-left')
+                                                    ])
+                                                ])
+                                            ], width=6),
+                                            dbc.Col([
+                                                dbc.Card([
+                                                    dbc.CardBody([
+                                                        html.Table(
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("ChinUp Peak Set:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='chin-up-peak-set'), style={'color': '#FF7F50'}),
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("ChinUp Peak 1-Rep-Max:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='chin-up-peak-1rm'), style={'color': '#FF7F50'})
+                                                            ]))] +
+                                                            [html.Tbody(html.Tr([
+                                                                html.Td(html.H4("ChinUp Peak Load:"), style={'padding-right': '20px'}), 
+                                                                html.Td(html.H4(id='chin-up-peak-load'), style={'color': '#FF7F50'})
+                                                            ]))]
+                                                        , className= 'text-left')
+                                                    ]) 
+                                                ])
+                                            ], width=6),
                                         ])
                                     ])
-                                ], width=7),
+                                ])
                             ])
                         ])
                     ]), width=8)
@@ -327,7 +412,373 @@ app.layout = dbc.Container([
                     ], id='card-2'),
                 ], width=6, className='text-left')
             ]),
+
+            # Spacer
+            html.Div(style={'height': '7px'}),
+            
+            dbc.Card(id='training-record-card', children=[
+                dbc.CardHeader(html.H4("Welcome Home! Lord Eric, Please Record Your Training:", className='text-center')),
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Card([
+                                dbc.CardHeader(html.H5("Record Bench Press:", className='text-center')),
+                                dbc.CardBody([
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 1", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set1-weight',
+                                                type='number',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter set weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set1-reps',
+                                                type='number',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 2", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set2-weight',
+                                                type='number',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter set weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set2-reps',
+                                                type='number',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 3", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set3-weight',
+                                                type='number',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter set weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set3-reps',
+                                                type='number',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 4", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set4-weight',
+                                                type='number',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter set weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set4-reps',
+                                                type='number',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 5", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set5-weight',
+                                                type='number',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter set weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                id='bench-set5-reps',
+                                                type='number',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    html.Div(style={'height': '5px'}),
+                                    dbc.CardFooter([
+                                        dbc.Row([
+                                            dbc.Col([
+                                                html.H5(id='bench-record-message', className='text-enter')
+                                            ], width=7),
+                                            dbc.Col([
+                                                html.Button(
+                                                'Record!', 
+                                                id='bench-record-button',
+                                                className='btn-primary btn-lg',
+                                                style={'width': '100%'}
+                                                )
+                                            ], width=5)
+                                        ])
+                                    ])
+                                ])
+                            ])
+                        ], width=6),
+                        dbc.Col([
+                            dbc.Card([
+                                dbc.CardHeader(html.H5("Record Chin Up:", className='text-center')),
+                                dbc.CardBody([
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 1", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set1-weight',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter added weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set1-reps',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 2", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set2-weight',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter added weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set2-reps',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 3", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set3-weight',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter added weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set3-reps',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 4", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set4-weight',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter added weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set4-reps',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    dbc.Row([
+                                        dbc.Col([
+                                            html.H5("Set 5", className='text-center align-self-center'),
+                                        ],className='d-flex justify-content-center align-items-center', width=2),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set5-weight',
+                                                min=0, max=500, step=5,
+                                                placeholder='Enter added weight (lbs)',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ], width=5),
+                                        dbc.Col([
+                                            dcc.Input(
+                                                type='number',
+                                                id='chin-set5-reps',
+                                                min=2, max=30, step=1,
+                                                placeholder='Enter set reps',
+                                                className='form-control',
+                                                style={'width': '100%', 'display': 'inline-block', 'marginRight': '5px'}
+                                            ),
+                                        ],width=5)
+                                    ]),
+                                    html.Div(style={'height': '5px'}),
+                                    dbc.CardFooter([
+                                        dbc.Row([
+                                            dbc.Col([
+                                                html.H5(id='chin-record-message',)
+                                            ], width=7),
+                                            dbc.Col([
+                                                html.Button(
+                                                'Record!',
+                                                id='chin-record-button', 
+                                                className='btn-primary btn-lg',
+                                                style={'width': '100%'}
+                                                )
+                                            ], width=5)
+                                        ])
+                                    ])
+                                ])
+                            ])
+                        ], width=6)
+                    ])
+                ])
+            ])
         ]),
+    ]),
+
+    html.Div(style={'height': '7px'}),
+
+    # Training Data Visualization Section
+    # Visualizations: 
+    dbc.Card([
+        dbc.CardHeader([
+            dbc.Row([
+                dbc.Col(width=2),
+                dbc.Col(html.H2(html.Strong('Training Data Plots'), className='text-center'), width=8, className='my-auto'),
+                dbc.Col(
+                    dbc.Button("Collapse ⬇️", id='collapse-button-2', className='custom-button', n_clicks=0),
+                    width=2, className='text-end'
+                )
+            ], className='align-items-center')
+        ], style={'background-color': '#000080'}),
+        dbc.Collapse([
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col(
+                        dbc.Card([
+                            dbc.CardHeader([
+                                html.H4("Bench Press", className='text-center'),
+                                dcc.Dropdown(
+                                    id = 'dropdown-bench-press-plots',
+                                    options=[
+                                        {'label': 'Weekly Average Load (lbs)', 'value': 'load'},
+                                        {'label': 'Weekly Average One-Rep-Max (lbs)', 'value': '1rm'},
+                                    ],
+                                    value='load' #default value
+                                ),
+                            ]),
+                            dbc.CardBody([
+                                dcc.Graph(id='bench-press-output', style={'padding': '0px', 'margin': '0px'})
+                            ])
+                        ]), 
+                    width=6),
+                    dbc.Col(
+                        dbc.Card([
+                            dbc.CardHeader([
+                                html.H4("Chin Up", className='text-center'),
+                                dcc.Dropdown(
+                                    id = 'dropdown-chin-up-plots',
+                                    options=[
+                                        {'label': 'Weekly Average Load (lbs)', 'value': 'load'},
+                                        {'label': 'Weekly Average One-Rep-Max (lbs)', 'value': '1rm'},
+                                    ],
+                                    value='load' #default value
+                                ),
+                            ]),
+                            dbc.CardBody([
+                                dcc.Graph(id='chin-up-output', style={'padding': '0px', 'margin': '0px'})
+                            ])
+                        ]), 
+                    width=6),
+                ]),
+            ])
+        ],id='collapse-part-2')
     ]),
 
     # Spacer
@@ -373,7 +824,7 @@ app.layout = dbc.Container([
                                         {'label': 'Past 6 Months', 'value': 'six_month'},
                                         {'label': 'Past Year', 'value': 'one_year'},
                                     ],
-                                    value='current_month' #default value
+                                    value='6_weeks' #default value
                                 ),
                             ]),
                             dbc.CardBody([
@@ -394,7 +845,7 @@ app.layout = dbc.Container([
                                         {'label': 'Past 6 Months', 'value': 'six_month'},
                                         {'label': 'Past Year', 'value': 'one_year'},
                                     ],
-                                    value='current_month' #default value
+                                    value='6_weeks' #default value
                                 ),
                             ]),
                             dbc.CardBody([
@@ -560,6 +1011,16 @@ def toggle_collapse(n, is_open):
         return not is_open
     return is_open
 
+@app.callback(
+    Output('collapse-part-2', "is_open"),
+    [Input('collapse-button-2', "n_clicks")],
+    [State('collapse-part-2', "is_open")],
+)
+def toggle_collapse_2(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
 # Callbacks to handle Password input
 @app.callback(
     Output('password-output', 'children'),
@@ -576,17 +1037,18 @@ def toggle_collapse(n, is_open):
     Output('button-train','style'),
     Output('train-message-2','style'),
     Output('train-message','style'),
+    Output('training-record-card','style'),
     Input('unlock-button', 'n_clicks'),
     State('password-input', 'value')
 )
 def unlock_features(n_clicks, password):
     correct_password = os.getenv('PASSWORD')
     if n_clicks is not None and password == correct_password:
-        return '', {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}
+        return '', {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}
     elif n_clicks is not None and password != correct_password:
-        return '', {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block', 'color': '#FF7F50'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}
+        return '', {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block', 'color': '#FF7F50'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}
     else:
-        return '', {'display': 'block'}, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block', 'color': '#FF7F50'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}
+        return '', {'display': 'block'}, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'block', 'color': '#FF7F50'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}
 app.layout['card-1'].style = {'display': 'block'}
 app.layout['message_2_1'].style = {'display': 'block'}
 app.layout['message_2_2'].style = {'display': 'none'}
@@ -600,6 +1062,9 @@ app.layout['message_3'].style = {'display': 'block', 'color': '#FF7F50'}
 app.layout['button-train'].style = {'display': 'none'}
 app.layout['train-message-2'].style = {'display': 'none'}
 app.layout['train-message'].style = {'display': 'none'}
+app.layout['training-record-card'].style = {'display': 'none'}
+
+# Recording Callbacks
 
 # Weight record call back 
 @app.callback(
@@ -654,6 +1119,128 @@ def record_weight(n_clicks, weight):
     else:
         return 'Record Weight Please! My Lord!'
 
+# Training record callbacks 
+# Bench Press record call back
+@app.callback(
+    Output('bench-record-message', 'children'),
+    Input('bench-record-button', 'n_clicks'),
+    [State('bench-set1-weight', 'value'),
+    State('bench-set1-reps', 'value'),
+    State('bench-set2-weight', 'value'),
+    State('bench-set2-reps', 'value'),
+    State('bench-set3-weight', 'value'),
+    State('bench-set3-reps', 'value'),
+    State('bench-set4-weight', 'value'),
+    State('bench-set4-reps', 'value'),
+    State('bench-set5-weight', 'value'),
+    State('bench-set5-reps', 'value')]
+)
+def record_bench(n_clicks, *args):
+
+    today_date_str = datetime.now().date().strftime('%Y-%m-%d')
+    records_to_insert = []
+    for i in range(0, len(args), 2):
+        weight = args[i]
+        rep = args[i+1]
+        if weight is not None and rep is not None:
+            records_to_insert.append({
+                'date': today_date_str,
+                'exercise_name': 'Bench Press (Barbell)',
+                'order': (i//2) + 1,
+                'weight': weight,
+                'rep': rep
+            })
+
+    if n_clicks is not None and records_to_insert:
+        try:
+            with engine.begin() as conn:  # automatically commits or rolls back the transaction
+                last_record_query = text("SELECT * FROM bench_press WHERE date = :today_date ORDER BY date DESC LIMIT 1")
+                last_record = pd.read_sql(last_record_query, conn, params={'today_date': today_date_str})
+                if last_record.empty:
+                    # Perform insertions here as no records for today exist
+                    insert_query = text(
+                        "INSERT INTO bench_press (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                    )
+                    for record in records_to_insert:
+                        conn.execute(insert_query, record)
+                    return "Successfully recorded bench press sets."
+                elif not last_record.empty:
+                    # Perform delete for today's record then insert new records
+                    delete_query = text("DELETE FROM bench_press WHERE date = :today_date")
+                    conn.execute(delete_query, {'today_date': today_date_str})
+                    insert_query = text(
+                        "INSERT INTO bench_press (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                    )
+                    for record in records_to_insert:
+                        conn.execute(insert_query, record)
+                    return "Successfully updated bench press sets."
+        except Exception as e:
+            return f'An error occurred: {e}'
+    else:
+        return 'Record Bench Training Please!'
+
+# Chin-up record call back
+@app.callback(
+    Output('chin-record-message', 'children'),
+    Input('chin-record-button', 'n_clicks'),
+    [State('chin-set1-weight', 'value'),
+    State('chin-set1-reps', 'value'),
+    State('chin-set2-weight', 'value'),
+    State('chin-set2-reps', 'value'),
+    State('chin-set3-weight', 'value'),
+    State('chin-set3-reps', 'value'),
+    State('chin-set4-weight', 'value'),
+    State('chin-set4-reps', 'value'),
+    State('chin-set5-weight', 'value'),
+    State('chin-set5-reps', 'value')]
+)
+def record_chinup(n_clicks, *args):
+
+    today_date_str = datetime.now().date().strftime('%Y-%m-%d')
+    records_to_insert = []
+    for i in range(0, len(args), 2):
+        weight = args[i]
+        rep = args[i+1]
+        if weight is not None and rep is not None:
+            records_to_insert.append({
+                'date': today_date_str,
+                'exercise_name': 'Chin Up',
+                'order': (i//2) + 1,
+                'weight': weight,
+                'rep': rep
+            })
+
+    if n_clicks is not None and records_to_insert:
+        try:
+            with engine.begin() as conn:  # automatically commits or rolls back the transaction
+                last_record_query = text("SELECT * FROM chin_up WHERE date = :today_date ORDER BY date DESC LIMIT 1")
+                last_record = pd.read_sql(last_record_query, conn, params={'today_date': today_date_str})
+                if last_record.empty:
+                    # Perform insertions here as no records for today exist
+                    insert_query = text(
+                        "INSERT INTO chin_up (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                    )
+                    for record in records_to_insert:
+                        conn.execute(insert_query, record)
+                    return "Successfully recorded Chin-up sets."
+                elif not last_record.empty:
+                    # Perform delete for today's record then insert new records
+                    delete_query = text("DELETE FROM chin_up WHERE date = :today_date")
+                    conn.execute(delete_query, {'today_date': today_date_str})
+                    insert_query = text(
+                        "INSERT INTO chin_up (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                    )
+                    for record in records_to_insert:
+                        conn.execute(insert_query, record)
+                    return "Successfully updated Chin-up sets."
+        except Exception as e:
+            return f'An error occurred: {e}'
+    else:
+        return 'Record Chin Up Training Please!'
+
+# Tracking Information Callbacks
+
+# Weight
 # Callbacks to displays the last recorded weight, date, and the number of days recorded
 @app.callback(
     [Output('last-recorded-date', 'children'),
@@ -716,6 +1303,136 @@ def update_days_recording_text(n):
     else:
         return f'Did not Track for:'
     
+# Training
+# Callbacks to displays the last recorded training date
+@app.callback(
+    Output('last-training-date', 'children'),
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def get_last_training_date(n):
+    # Connect to the database and retrieve the last record
+    with engine.connect() as conn:
+        bench_query =   '''
+                        SELECT date 
+                        FROM bench_press 
+                        ORDER BY date DESC 
+                        LIMIT 1
+                        '''
+        bench_record = pd.read_sql(bench_query, conn)
+        chinup_query =  '''
+                        SELECT date 
+                        FROM chin_up 
+                        ORDER BY date DESC 
+                        LIMIT 1
+                        '''
+        chinup_record = pd.read_sql(chinup_query, conn)
+
+    last_bench_date = bench_record.iloc[0]['date']
+    last_chinup_date = chinup_record.iloc[0]['date']
+
+    if last_bench_date>last_chinup_date:
+        return last_bench_date
+    else:
+        return last_chinup_date
+
+# Callback to get bench press pr
+@app.callback(
+    Output('bench-pr-1rm', 'children'),
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def get_bench_pr(n):
+    # Connect to the database and retrieve the last record
+    with engine.connect() as conn:
+        bench_1rm_query =   '''
+                            WITH a AS
+                            (
+                            SELECT date, MAX(weight) AS m_weight
+                            FROM bench_press
+                            GROUP BY date
+                            ),
+                            b AS
+                            (
+                            SELECT MAX(m_weight) as weight
+                            FROM a
+                            )
+                            SELECT bench_press.weight, MAX(bench_press.rep) as m_rep
+                            FROM bench_press
+                            INNER JOIN b
+                            ON bench_press.weight = b.weight
+                            GROUP BY bench_press.weight
+                            '''
+        bench_1rm = pd.read_sql(bench_1rm_query, conn)
+    
+    bench_pr_weight = bench_1rm.iloc[0]['weight']
+    bench_pr_rep = bench_1rm.iloc[0]['m_rep']
+
+    # Prepare a dictionary to calculate 1rm
+    one_rm_dict = {'1.0': 1, '2.0': 0.95, '3.0': 0.93, '4.0': 0.9, '5.0': 0.87, '6.0': 0.85,
+                   '7.0': 0.83, '8.0': 0.80, '9.0': 0.77, '10.0': 0.75, '11.0': 0.70, '12.0': 0.67,
+                   '13.0': 0.65, '14.0': 0.63, '15.0': 0.62, '16.0': 0.55, '17.0': 0.52, '18.0': 0.49,
+                   '19.0': 0.46, '20.0': 0.43}
+
+    # Convert the float to a string with one decimal place
+    bench_pr_rep_key = f"{bench_pr_rep:.1f}"
+
+    # Get the corresponding value from the dictionary
+    one_rm_dict_value = one_rm_dict.get(bench_pr_rep_key)
+
+    # Calculate the true one rep max
+    one_rm = bench_pr_weight/one_rm_dict_value
+
+    return f'{one_rm:.0f} lbs'
+
+# Callback to get chin up pr
+@app.callback(
+    Output('chinup-pr-1rm', 'children'),
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def get_chin_up_pr(n):
+    # Connect to the database and retrieve the last record
+    with engine.connect() as conn:
+        chinup_1rm_query =  '''
+                            WITH a AS
+                            (
+                            SELECT      chin_up.date, chin_up.weight+weight_records.weight*2/0.9 AS weight, chin_up.rep
+                            FROM        chin_up
+                            INNER JOIN  weight_records
+                            ON          chin_up.date = weight_records.date
+                            ),
+                            b AS
+                            (
+                            SELECT      date, MAX(weight) AS weight
+                            FROM        a
+                            GROUP BY    date
+                            )
+                            SELECT      a.date, a.weight, MAX(a.rep) AS rep
+                            FROM        a
+                            INNER JOIN  b
+                            ON          a.date = b.date AND a.weight=b.weight
+                            GROUP BY    a.date, a.weight
+                            ORDER BY    a.date
+                            '''
+        chinup_1rm = pd.read_sql(chinup_1rm_query, conn)
+    
+    # Prepare a dictionary to calculate 1rm
+    one_rm_dict = {'1.0': 1, '2.0': 0.95, '3.0': 0.93, '4.0': 0.9, '5.0': 0.87, '6.0': 0.85,
+                   '7.0': 0.83, '8.0': 0.80, '9.0': 0.77, '10.0': 0.75, '11.0': 0.70, '12.0': 0.67,
+                   '13.0': 0.65, '14.0': 0.63, '15.0': 0.62, '16.0': 0.55, '17.0': 0.52, '18.0': 0.49,
+                   '19.0': 0.46, '20.0': 0.43}
+    
+    # Convert the float to a string with one decimal place
+    chinup_1rm['rep'] = chinup_1rm['rep'].apply(lambda x: f"{x:.1f}")
+    # Get the corresponding value from the dictionary
+    chinup_1rm['percentage'] = chinup_1rm['rep'].map(one_rm_dict)
+    # get 1 rep max
+    chinup_1rm['one_rep_max'] = chinup_1rm['weight']/chinup_1rm['percentage']
+    one_rm = chinup_1rm['one_rep_max'].max()
+
+    return f'{one_rm:.0f} lbs'
+    
+# Weekly Summary Callbacks
+
+# Weight
 # Callback to display today's date
 @app.callback(
     Output('week-status', 'children'),
@@ -894,7 +1611,352 @@ def get_caloric_status(n):
         status_style = {'color': '#dc3545'}
     return status_text, status_style
 
+# Training
+# Callback to get bench press weekly stats
+@app.callback(
+    [Output('bench-peak-set', 'children'),
+     Output('bench-peak-1rm', 'children'),
+     Output('bench-peak-load', 'children')],
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def get_bench_peak_set(n):
+    # Connect to the database and retrieve the last record
+    # Get current week df
+    today = datetime.today()
+    start_of_week = today - timedelta(days=today.weekday())
+    start_of_week_str = start_of_week.strftime('%Y-%m-%d')
+    query_current_1rm = f"""
+            WITH a AS
+            (
+            SELECT date, MAX(weight) as m_weight
+            FROM bench_press 
+            WHERE date >= '{start_of_week_str}'
+            GROUP BY date
+            )
+            SELECT bench_press.weight, MAX(bench_press.rep) AS rep
+            FROM bench_press
+            INNER JOIN a
+            ON bench_press.date = a.date AND bench_press.weight = a.m_weight
+            GROUP BY bench_press.weight
+            """
+    query_load = f"""
+            WITH a AS
+            (
+            SELECT date, SUM(weight*rep) AS load
+            FROM bench_press 
+            WHERE date >= '{start_of_week_str}'
+            GROUP BY date
+            )
+            SELECT MAX(load) AS max_load
+            FROM a
+            """
+    with engine.connect() as conn:
+        bench_record = pd.read_sql(query_current_1rm, conn)
+        bench_load = pd.read_sql(query_load, conn)
+
+    # Prepare a dictionary to calculate 1rm
+    one_rm_dict = {'1.0': 1, '2.0': 0.95, '3.0': 0.93, '4.0': 0.9, '5.0': 0.87, '6.0': 0.85,
+                   '7.0': 0.83, '8.0': 0.80, '9.0': 0.77, '10.0': 0.75, '11.0': 0.70, '12.0': 0.67,
+                   '13.0': 0.65, '14.0': 0.63, '15.0': 0.62, '16.0': 0.55, '17.0': 0.52, '18.0': 0.49,
+                   '19.0': 0.46, '20.0': 0.43}
+    
+    if not bench_record.empty:
+        bench_record_weight = bench_record.iloc[0]['weight']
+        bench_record_rep = bench_record.iloc[0]['rep']
+        bench_max_load = bench_load.iloc[0]['max_load']
+
+        # Convert the float to a string with one decimal place
+        bench_pr_rep_key = f"{bench_record_rep:.1f}"
+
+        # Get the corresponding value from the dictionary
+        one_rm_dict_value = one_rm_dict.get(bench_pr_rep_key)
+
+        # Calculate the true one rep max
+        one_rm = bench_record_weight/one_rm_dict_value
+
+        return f'{bench_record_weight}lbs X {bench_record_rep}reps', f'{one_rm:.0f} lbs', f'{bench_max_load:.0f} lbs'
+    else:
+        return "No Training yet!", "No Training yet!", "No Training yet!"
+
+# Callback to get chin up weekly stats
+@app.callback(
+    [Output('chin-up-peak-set', 'children'),
+     Output('chin-up-peak-1rm', 'children'),
+     Output('chin-up-peak-load', 'children')],
+    [Input('interval-component', 'n_intervals')]  # This input is triggered when the page loads
+)
+def get_bench_peak_set(n):
+    # Connect to the database and retrieve the last record
+    # Get current week df
+    today = datetime.today()
+    start_of_week = today - timedelta(days=today.weekday())
+    start_of_week_str = start_of_week.strftime('%Y-%m-%d')
+    query_current_1rm = f'''
+                        WITH a AS
+                        (
+                        SELECT date, MAX(rep) AS max_rep
+                        FROM chin_up
+                        WHERE date >= '{start_of_week_str}'
+                        GROUP BY date
+                        ),
+                        b AS
+                        (
+                        SELECT MAX(max_rep) as max_rep
+                        FROM a
+                        ),
+                        c AS
+                        (
+                        SELECT chin_up.date, MAX(chin_up.weight) AS weight, chin_up.rep
+                        FROM chin_up
+                        INNER JOIN b
+                        ON chin_up.rep = b.max_rep
+                        WHERE chin_up.date >= '{start_of_week_str}'
+                        GROUP BY chin_up.date, chin_up.rep
+                        )
+                        SELECT c.weight+(weight_records.weight*2/0.9) AS weight, c.rep AS rep
+                        FROM c
+                        INNER JOIN weight_records
+                        ON c.date = weight_records.date
+                        '''
+    query_load =        f"""
+                        WITH a AS
+                        (
+                        SELECT chin_up.date, (chin_up.weight+weight_records.weight*2/0.9)*chin_up.rep AS load
+                        FROM chin_up
+                        INNER JOIN weight_records
+                        ON chin_up.date = weight_records.date
+                        WHERE chin_up.date >= '{start_of_week_str}'
+                        )
+                        SELECT MAX(load) AS max_load
+                        FROM a
+                        """
+    # Prepare a dictionary to calculate 1rm
+    one_rm_dict = {'1.0': 1, '2.0': 0.95, '3.0': 0.93, '4.0': 0.9, '5.0': 0.87, '6.0': 0.85,
+                   '7.0': 0.83, '8.0': 0.80, '9.0': 0.77, '10.0': 0.75, '11.0': 0.70, '12.0': 0.67,
+                   '13.0': 0.65, '14.0': 0.63, '15.0': 0.62, '16.0': 0.55, '17.0': 0.52, '18.0': 0.49,
+                   '19.0': 0.46, '20.0': 0.43}
+    
+    with engine.connect() as conn:
+        chinup_record = pd.read_sql(query_current_1rm, conn)
+        chinup_load = pd.read_sql(query_load, conn)
+
+    if not chinup_record.empty:
+        chinup_record_weight = chinup_record.iloc[0]['weight']
+        chinup_record_rep = chinup_record.iloc[0]['rep']
+        chinup_max_load = chinup_load.iloc[0]['max_load']
+
+        # Convert the float to a string with one decimal place
+        chinup_pr_rep_key = f"{chinup_record_rep:.1f}"
+
+        # Get the corresponding value from the dictionary
+        one_rm_dict_value = one_rm_dict.get(chinup_pr_rep_key)
+
+        # Calculate the true one rep max
+        one_rm = chinup_record_weight/one_rm_dict_value
+
+        return f'{chinup_record_weight}lbs X {chinup_record_rep}reps', f'{one_rm:.0f} lbs', f'{chinup_max_load:.0f} lbs'
+    else:
+        return "No Training yet!", "No Training yet!", "No Training yet!"
+
+
 #### Plots Callbacks ####
+    
+# Callback to plot Bench Press data
+@app.callback(
+    Output('bench-press-output', 'figure'),
+    [Input('dropdown-bench-press-plots', 'value')]
+)
+def update_graph_bench(selected_value):
+    # Reading Data from database and create dataframes to plot
+    with engine.connect() as conn:
+        # Queries
+        query_load ='''
+            SELECT      date, SUM(weight*rep) AS load
+            FROM        bench_press
+            GROUP BY    date
+            ORDER BY    date
+            '''
+        query_1rm = '''
+            WITH a AS
+            (
+            SELECT      date, MAX(weight) AS weight
+            FROM        bench_press
+            GROUP BY    date
+            )
+            SELECT      bench_press.date, bench_press.weight, MAX(bench_press.rep) AS rep
+            FROM        a
+            INNER JOIN  bench_press
+            ON          a.date = bench_press.date AND a.weight = bench_press.weight
+            GROUP BY    bench_press.date, bench_press.weight
+            ORDER BY    bench_press.date
+            '''
+        df_load = pd.read_sql_query(query_load, engine)
+        df_1rm = pd.read_sql_query(query_1rm, engine)
+    # Prepare dataframes for plots
+    # Load
+    df_load['date'] = pd.to_datetime(df_load['date'])
+    df_load.set_index('date', inplace=True)
+    df_load = df_load['load'].resample('W').mean().reset_index()
+    df_load['load'] = df_load['load'].interpolate()
+    # One Rep Max
+    # Prepare a dictionary to calculate 1rm
+    one_rm_dict = {'1.0': 1, '2.0': 0.95, '3.0': 0.93, '4.0': 0.9, '5.0': 0.87, '6.0': 0.85,
+                    '7.0': 0.83, '8.0': 0.80, '9.0': 0.77, '10.0': 0.75, '11.0': 0.70, '12.0': 0.67,
+                    '13.0': 0.65, '14.0': 0.63, '15.0': 0.62, '16.0': 0.55, '17.0': 0.52, '18.0': 0.49,
+                    '19.0': 0.46, '20.0': 0.43}
+    df_1rm['rep'] = df_1rm['rep'].apply(lambda x: f"{x:.1f}")
+    df_1rm['percentage'] = df_1rm['rep'].map(one_rm_dict)
+    df_1rm['one_rep_max'] = df_1rm['weight']/df_1rm['percentage']
+
+    # Plot 1 (Load)
+    if selected_value == 'load':
+        fig = px.line(df_load, x='date', y='load')
+        fig.update_layout(
+            xaxis_title='',
+            yaxis_title='Weekly Average Load per Workout (lbs)',
+            margin=dict(t=10, l=0, r=0, b=0),
+            xaxis=dict(
+                type="date",
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=3, label="3m", step="month", stepmode="backward"),
+                        dict(count=6, label="6m", step="month", stepmode="backward"),
+                        dict(count=1, label="1y", step="year", stepmode="backward"),
+                        dict(count=2, label="2y", step="year", stepmode="backward"),
+                        dict(count=3, label="3y", step="year", stepmode="backward"),
+                        dict(step="all")
+                    ])
+                )
+            )
+        )
+        return fig
+    elif selected_value == '1rm':
+        fig = px.line(df_1rm, x='date', y='one_rep_max')
+        fig.update_layout(
+            xaxis_title='',
+            yaxis_title='Weekly Average 1-Rep-Max per Workout (lbs)',
+            margin=dict(t=10, l=0, r=0, b=0),
+            xaxis=dict(
+                type="date",
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=3, label="3m", step="month", stepmode="backward"),
+                        dict(count=6, label="6m", step="month", stepmode="backward"),
+                        dict(count=1, label="1y", step="year", stepmode="backward"),
+                        dict(count=2, label="2y", step="year", stepmode="backward"),
+                        dict(count=3, label="3y", step="year", stepmode="backward"),
+                        dict(step="all")
+                    ])
+                )
+            )
+        )
+        return fig
+
+
+# Callback to plot Chin-up data
+@app.callback(
+    Output('chin-up-output', 'figure'),
+    [Input('dropdown-chin-up-plots', 'value')]
+)
+def update_graph_chinup(selected_value):
+    # Reading Data from database and create dataframes to plot
+    with engine.connect() as conn:
+        # Queries
+        query_load ='''
+            SELECT      chin_up.date, SUM((chin_up.weight+weight_records.weight*2/0.9) * chin_up.rep) AS load
+            FROM        chin_up
+            INNER JOIN  weight_records
+            ON          chin_up.date = weight_records.date
+            GROUP BY    chin_up.date
+            '''
+        query_1rm = '''
+            WITH a AS
+            (
+            SELECT      chin_up.date, chin_up.weight+weight_records.weight*2/0.9 AS weight, chin_up.rep
+            FROM        chin_up
+            INNER JOIN  weight_records
+            ON          chin_up.date = weight_records.date
+            ),
+            b AS
+            (
+            SELECT      date, MAX(weight) AS weight
+            FROM        a
+            GROUP BY    date
+            )
+            SELECT      a.date, a.weight, MAX(a.rep) AS rep
+            FROM        a
+            INNER JOIN  b
+            ON          a.date = b.date AND a.weight=b.weight
+            GROUP BY    a.date, a.weight
+            ORDER BY    a.date
+            '''
+        df_load = pd.read_sql_query(query_load, engine)
+        df_1rm = pd.read_sql_query(query_1rm, engine)
+    # Prepare dataframes for plots
+    # Load
+    df_load['date'] = pd.to_datetime(df_load['date'])
+    df_load.set_index('date', inplace=True)
+    df_load = df_load['load'].resample('W').mean().reset_index()
+    df_load['load'] = df_load['load'].interpolate()
+    # One Rep Max
+    # Prepare a dictionary to calculate 1rm
+    one_rm_dict = {'1.0': 1, '2.0': 0.95, '3.0': 0.93, '4.0': 0.9, '5.0': 0.87, '6.0': 0.85,
+                    '7.0': 0.83, '8.0': 0.80, '9.0': 0.77, '10.0': 0.75, '11.0': 0.70, '12.0': 0.67,
+                    '13.0': 0.65, '14.0': 0.63, '15.0': 0.62, '16.0': 0.55, '17.0': 0.52, '18.0': 0.49,
+                    '19.0': 0.46, '20.0': 0.43}
+    df_1rm['rep'] = df_1rm['rep'].apply(lambda x: f"{x:.1f}")
+    df_1rm['percentage'] = df_1rm['rep'].map(one_rm_dict)
+    df_1rm['one_rep_max'] = df_1rm['weight']/df_1rm['percentage']
+    df_1rm['date'] = pd.to_datetime(df_1rm['date'])
+    df_1rm.set_index('date', inplace=True)
+    df_1rm = df_1rm['one_rep_max'].resample('W').mean().reset_index()
+    df_1rm['one_rep_max'] = df_1rm['one_rep_max'].interpolate()
+
+    # Plot 1 (Load)
+    if selected_value == 'load':
+        fig = px.line(df_load, x='date', y='load')
+        fig.update_layout(
+            xaxis_title='',
+            yaxis_title='Weekly Average Load per Workout (lbs)',
+            margin=dict(t=10, l=0, r=0, b=0),
+            xaxis=dict(
+                type="date",
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=3, label="3m", step="month", stepmode="backward"),
+                        dict(count=6, label="6m", step="month", stepmode="backward"),
+                        dict(count=1, label="1y", step="year", stepmode="backward"),
+                        dict(count=2, label="2y", step="year", stepmode="backward"),
+                        dict(count=3, label="3y", step="year", stepmode="backward"),
+                        dict(step="all")
+                    ])
+                )
+            )
+        )
+        return fig
+    elif selected_value == '1rm':
+        fig = px.line(df_1rm, x='date', y='one_rep_max')
+        fig.update_layout(
+            xaxis_title='',
+            yaxis_title='Weekly Average 1-Rep-Max per Workout (lbs)',
+            margin=dict(t=10, l=0, r=0, b=0),
+            xaxis=dict(
+                type="date",
+                rangeselector=dict(
+                    buttons=list([
+                        dict(count=3, label="3m", step="month", stepmode="backward"),
+                        dict(count=6, label="6m", step="month", stepmode="backward"),
+                        dict(count=1, label="1y", step="year", stepmode="backward"),
+                        dict(count=2, label="2y", step="year", stepmode="backward"),
+                        dict(count=3, label="3y", step="year", stepmode="backward"),
+                        dict(step="all")
+                    ])
+                )
+            )
+        )
+        return fig
+
+
 # Callback to switch between day vs week and all data
 @app.callback(
     [Output('day-vs-week-body', 'style'),
@@ -993,8 +2055,7 @@ def update_graph_all(selected_value):
 # Callback: Daily
 @app.callback(
     Output('daily', 'figure'),
-    [Input('dropdown-daily', 'value')]
-)
+    [Input('dropdown-daily', 'value')])
 def update_graph_daily(selected_value):
     # Reading Data from database and create dataframes to plot
     with engine.connect() as conn:
@@ -1195,7 +2256,7 @@ def update_graph_weekly_avg(selected_value):
     df_current_month = pd.DataFrame(month_dates, columns=['date']).merge(df_1, on='date', how='left')
     df_current_month.set_index('date', inplace=True)
     df_current_month = df_current_month['weight'].resample('W').mean().reset_index()
-    df_current_month['week'] = df_current_month['date'].dt.strftime('Week %U')
+    df_current_month['week'] = df_current_month['date']
     
     # 2
     six_weeks_dates = pd.date_range(start=start_of_five_weeks_ago, periods=42, freq='D')
