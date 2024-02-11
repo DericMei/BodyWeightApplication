@@ -198,7 +198,7 @@ PostgreSQL, Sqlite3, Plotly, Prophet Model, Time Series Analysis, Virtual Enviro
 
 ## Main Files
 For future references, I am not going to list all files in the repository since some of them are not that relevant. I will only point out the important ones:
-- weight_tracker.py (this is the dash web application python file)
+- fitness_tool.py (this is the updated dash web application python file)
 - Project Code.ipynb (this is the jupyter notebook file I have alone with the python file to support the main design of this application, including database creation, data cleaning, EDA and so much more)
 - custome_styles.css (this is the css file that supports the web application for styles design)
 - demo.gif (this is the demo you saw on top of this page)
