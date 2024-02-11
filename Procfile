@@ -1,1 +1,1 @@
-web: gunicorn weight_tracker:server
+web: gunicorn fitness_tool:server
