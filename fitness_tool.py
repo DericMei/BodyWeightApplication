@@ -1159,7 +1159,7 @@ def record_bench(n_clicks, *args):
                 if last_record.empty:
                     # Perform insertions here as no records for today exist
                     insert_query = text(
-                        "INSERT INTO bench_press (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                        "INSERT INTO bench_press (date, exercise_name, \"order\", weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
                     )
                     for record in records_to_insert:
                         conn.execute(insert_query, record)
@@ -1169,8 +1169,8 @@ def record_bench(n_clicks, *args):
                     delete_query = text("DELETE FROM bench_press WHERE date = :today_date")
                     conn.execute(delete_query, {'today_date': today_date_str})
                     insert_query = text(
-                        "INSERT INTO bench_press (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
-                    )
+                                    "INSERT INTO bench_press (date, exercise_name, \"order\", weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                                    )
                     for record in records_to_insert:
                         conn.execute(insert_query, record)
                     return "Successfully updated bench press sets."
@@ -1218,7 +1218,7 @@ def record_chinup(n_clicks, *args):
                 if last_record.empty:
                     # Perform insertions here as no records for today exist
                     insert_query = text(
-                        "INSERT INTO chin_up (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                        "INSERT INTO chin_up (date, exercise_name, \"order\", weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
                     )
                     for record in records_to_insert:
                         conn.execute(insert_query, record)
@@ -1228,7 +1228,7 @@ def record_chinup(n_clicks, *args):
                     delete_query = text("DELETE FROM chin_up WHERE date = :today_date")
                     conn.execute(delete_query, {'today_date': today_date_str})
                     insert_query = text(
-                        "INSERT INTO chin_up (date, exercise_name, order, weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
+                        "INSERT INTO chin_up (date, exercise_name, \"order\", weight, rep) VALUES (:date, :exercise_name, :order, :weight, :rep)"
                     )
                     for record in records_to_insert:
                         conn.execute(insert_query, record)
@@ -1754,7 +1754,7 @@ def get_bench_peak_set(n):
         # Calculate the true one rep max
         one_rm = chinup_record_weight/one_rm_dict_value
 
-        return f'{chinup_record_weight}lbs X {chinup_record_rep}reps', f'{one_rm:.0f} lbs', f'{chinup_max_load:.0f} lbs'
+        return f'{chinup_record_weight:.0f}lbs X {chinup_record_rep:.0f}reps', f'{one_rm:.0f} lbs', f'{chinup_max_load:.0f} lbs'
     else:
         return "No Training yet!", "No Training yet!", "No Training yet!"
 
